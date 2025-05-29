@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes'
 import noteRoutes from './routes/note.routes';
 import errorHandler from './middlewares/error.middleware';
+import './configs/passport.config'; // Ensure passport strategies are loaded
+import passport from 'passport';
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 
 // Routes
