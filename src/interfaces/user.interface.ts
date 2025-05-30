@@ -5,6 +5,6 @@ export interface IUser extends Document {
   email?: string;
   password: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
-  provider: 'local' | 'google' | 'facebook';
+  provider: 'local' | 'google' | 'facebook' | 'github';
   providerId?: string;
 }

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import e, { Request, Response, NextFunction } from 'express';
 import User from '../models/user.model';
 import jwt from 'jsonwebtoken';
 import {generateToken} from '../utils/jwt.util';
@@ -23,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
     // Generate token
     const token = generateToken(user);
 
-    res.status(201).json({ token, user: { id: user._id, username, email } });
+    res.status(201).json({ token: token, user: { id: user._id, username, email } });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -65,11 +65,29 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   // }
 };
 
+// export const oauthSuccess = async (req: Request, res: Response) => {
+//   if (!req.user) return res.redirect('/login');
+//   const user = req.user as any;
+//   res.json({ token: generateToken(user._id) });
+// };
+// export const oauthError = (req: Request, res: Response) => {
+//   res.status(400).json({ message: 'OAuth authentication failed' });   
+// }
+
 export const oauthSuccess = async (req: Request, res: Response) => {
   if (!req.user) return res.redirect('/login');
   const user = req.user as any;
-  res.json({ token: generateToken(user._id) });
+  res.json({
+    token: generateToken(user._id),
+    user: {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    }
+  });
 };
+
+
 
 
 export const getMe = async (req: Request, res: Response) => {
