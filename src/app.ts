@@ -8,6 +8,8 @@ import noteRoutes from './routes/note.routes';
 import errorHandler from './middlewares/error.middleware';
 import './configs/passport.config'; // Ensure passport strategies are loaded
 import passport from 'passport';
+import userRoutes from './routes/user.routes';
+import { protect } from './middlewares/auth.middleware';
 
 dotenv.config();
 
@@ -26,8 +28,9 @@ app.use(passport.initialize());
 app.get("/", (req, res)=>{
     res.send("Hello, welcome to our book app!");
 })
-app.use('/api/auth', authRoutes);
-app.use('/api/notes', noteRoutes);
+app.use('/api/auth', authRoutes); // Authentication routes
+app.use('/api/users', protect, userRoutes); // User management routes
+app.use('/api/notes', noteRoutes); // Note management routes
 
 // Error handling middleware
 app.use(errorHandler);

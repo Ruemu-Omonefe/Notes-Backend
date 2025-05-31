@@ -1,7 +1,10 @@
 import { Router } from 'express';
+import { createNote } from '../controllers/note.controller';
 
 const router = Router();
-// router.post('/register');
+
+router.post('/', createNote);
+// router.post('/');
 // router.post('/login',);
 // router.get('/me');
 
