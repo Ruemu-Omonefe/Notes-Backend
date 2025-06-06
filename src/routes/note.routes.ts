@@ -1,9 +1,14 @@
 import { Router } from 'express';
-import { createNote } from '../controllers/note.controller';
+import { createNote, updateNote } from '../controllers/note.controller';
+import multer from 'multer';
 
 const router = Router();
 
-router.post('/', createNote);
+// Use multer for parsing multipart/form-data
+const upload = multer({ dest: 'uploads/' }); 
+
+router.post('/', upload.any(), createNote);
+router.put('/', upload.any(), updateNote);
 // router.post('/');
 // router.post('/login',);
 // router.get('/me');

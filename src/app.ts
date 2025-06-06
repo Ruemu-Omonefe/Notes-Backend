@@ -30,7 +30,7 @@ app.get("/", (req, res)=>{
 })
 app.use('/api/auth', authRoutes); // Authentication routes
 app.use('/api/users', protect, userRoutes); // User management routes
-app.use('/api/notes', noteRoutes); // Note management routes
+app.use('/api/notes',protect, noteRoutes); // Note management routes
 
 // Error handling middleware
 app.use(errorHandler);

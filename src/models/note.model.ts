@@ -1,24 +1,26 @@
-import mongoose, { Schema } from 'mongoose';
-import { INote, IPage } from '../interfaces/note.interface';
+import mongoose, { Schema } from "mongoose";
+import { IContentItem, INote } from "../interfaces/note.interface";
 
 
-const PageSchema = new Schema<IPage>({
-  pageNumber: { type: Number, required: true },
-  text: String,
-  images: [String],
-  audios: [String],
+const ContentItemSchema = new Schema<IContentItem>({
+  type: { type: String, enum: ['text', 'image', 'audio'], required: true },
+  content: { type: String, required: true },
+  metadata: {
+    altText: String,
+    duration: Number,
+    size: Number,
+    width: Number,
+    height: Number,
+  }
 });
 
-const NoteSchema = new Schema<INote>(
-  {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    title: { type: String, required: true },
-    coverDesign: { type: String, required: true },
-    numberOfPages: { type: Number, required: true },
-    pages: [PageSchema],
-  },
-  { timestamps: true }
-);
-
+const NoteSchema = new Schema<INote>({
+  title: { type: String, required: true },
+  userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+  coverDesign: { type: String, required: true },
+  numberOfPages: { type: Number, required: true },
+  content: [ContentItemSchema], // array preserves order
+  isFavorite: { type: Boolean, default: false },
+}, { timestamps: true });
 
 export default mongoose.model<INote>('Note', NoteSchema);
