@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Note from "../models/note.model";
 import { uploadToCloudinary } from "../configs/cloudinary.config";
 import { IContentItem } from "../interfaces/note.interface";
+import fs from 'fs/promises';
 
 export const createNote = async (req: Request, res: Response) => {
   try {
@@ -31,7 +32,8 @@ export const createNote = async (req: Request, res: Response) => {
         }
 
         const resourceType = item.type === "image" ? "image" : "video";
-        const uploadResult = await uploadToCloudinary(file.path, resourceType);
+        const uploadResult = await uploadToCloudinary(file.path, resourceType, file.originalname);
+        await fs.unlink(file.path);
         contentValue = uploadResult.url;
       }
 
@@ -66,62 +68,64 @@ export const createNote = async (req: Request, res: Response) => {
 export const updateNote = async (req: Request, res: Response) => {
   try {
     const noteId = req.params.id;
-    const { title, coverDesign, numberOfPages } = req.body;
-
-    // Parse content
-    let contentOrder: IContentItem[] = [];
-
-    try {
-      contentOrder = typeof req.body.content === "string" ? JSON.parse(req.body.content) : req.body.content;
-    } catch (error) {
-      res.status(400).json({ error: "Invalid content JSON." });
-    }
-
+    const { title, coverDesign, numberOfPages, isFavorite } = req.body;
     const files = req.files as Express.Multer.File[] || [];
 
-    const processedContent: IContentItem[] = [];
+    let updateData: any = {
+      updatedAt: new Date(),
+    };
 
-    for (let item of contentOrder) {
-      if (!item.type || !item.content) {
-        console.warn("Skipping invalid item:", item);
-        continue;
+    if (title) updateData.title = title;
+    if (coverDesign) updateData.coverDesign = coverDesign;
+    if (numberOfPages) updateData.numberOfPages = Number(numberOfPages);
+    if (isFavorite) updateData.isFavorite = isFavorite;
+
+    if (req.body.content) {
+      let contentOrder: IContentItem[] = [];
+
+      try {
+        contentOrder = typeof req.body.content === "string"
+          ? JSON.parse(req.body.content)
+          : req.body.content;
+      } catch (error) {
+        res.status(400).json({ error: "Invalid content JSON." });
       }
 
-      let contentValue = item.content;
+      const processedContent: IContentItem[] = [];
 
-      // If it's an image or audio, check if it's a file upload or an existing URL
-      if (item.type === "image" || item.type === "audio") {
-        const uploadedFile = files.find(f => f.originalname === item.content);
-
-        if (uploadedFile) {
-          const resourceType = item.type === "image" ? "image" : "video";
-          const result = await uploadToCloudinary(uploadedFile.path, resourceType);
-          contentValue = result.url;
+      for (let item of contentOrder) {
+        if (!item.type || !item.content) {
+          console.warn("Skipping invalid item:", item);
+          continue;
         }
-        // else: retain the old URL in `content`
+
+        let contentValue = item.content;
+        const isCloudinaryUrl = typeof contentValue === "string" && contentValue.startsWith("http");
+
+        if ((item.type === "image" || item.type === "audio") && !isCloudinaryUrl) {
+          const uploadedFile = files.find(f => f.originalname === item.content);
+
+          if (uploadedFile) {
+            const resourceType = item.type === "image" ? "image" : "video";
+            const result = await uploadToCloudinary(uploadedFile.path, resourceType, uploadedFile.originalname);
+            contentValue = result.url;
+          }
+        }
+
+        processedContent.push({
+          type: item.type,
+          content: contentValue,
+          metadata: item.metadata || {},
+        });
       }
 
-      processedContent.push({
-        type: item.type,
-        content: contentValue,
-        metadata: item.metadata || {},
-      });
+      updateData.content = processedContent;
     }
 
-    const updatedNote = await Note.findByIdAndUpdate(
-      noteId,
-      {
-        title,
-        coverDesign,
-        numberOfPages,
-        content: processedContent,
-        updatedAt: new Date(),
-      },
-      { new: true }
-    );
+    const updatedNote = await Note.findByIdAndUpdate(noteId, updateData, { new: true });
 
     if (!updatedNote) {
-      res.status(404).json({ error: "Note not found." });
+       res.status(404).json({ error: "Note not found." });
     }
 
     res.status(200).json(updatedNote);

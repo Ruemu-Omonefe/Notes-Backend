@@ -9,7 +9,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch users', error });
   }
-};``
+};`         `
 
 export function getUserById(req: Request, res: Response) {
     const id = req.params.id

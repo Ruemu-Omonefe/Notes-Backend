@@ -8,7 +8,7 @@ const router = Router();
 const upload = multer({ dest: 'uploads/' }); 
 
 router.post('/', upload.any(), createNote);
-router.put('/', upload.any(), updateNote);
+router.put('/:id', upload.any(), updateNote);
 // router.post('/');
 // router.post('/login',);
 // router.get('/me');

@@ -1,6 +1,7 @@
 // utils/cloudinary.ts
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 cloudinary.config({
@@ -9,9 +10,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET!
 });
 
-export const uploadToCloudinary = async (filePath: string, resourceType: 'image' | 'video' | 'auto') => {
+export const uploadToCloudinary = async (filePath: string, resourceType: 'image' | 'video' | 'auto', originalFileName: string) => {
+    const publicId = path.parse(originalFileName).name; 
   const result = await cloudinary.uploader.upload(filePath, {
     resource_type: resourceType,
+    public_id: publicId,
+    overwrite: true,
+    use_filename: true,
+    unique_filename: false,
   });
   return {
     url: result.secure_url,
