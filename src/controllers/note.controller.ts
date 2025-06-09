@@ -9,12 +9,15 @@ export const createNote = async (req: Request, res: Response) => {
     const { title, userId, numberOfPages, coverDesign } = req.body;
 
     let contentOrder: IContentItem[] = [];
-    
+    console.log('Received content:', req.body.content);
+    console.log('Received content:', typeof(req.body.content));
     try {
+
       contentOrder = typeof req.body.content === 'string' ? JSON.parse(req.body.content) : req.body.content;
       console.log('✅ Parsed contentOrder:', contentOrder);
     } catch (err) {
-    res.status(400).json({ error: "Invalid content JSON format." });
+      res.status(400).json({ message: "Invalid content JSON format." });
+      return;
     }
 
     const files = req.files as Express.Multer.File[] || [];
@@ -108,6 +111,7 @@ export const updateNote = async (req: Request, res: Response) => {
           if (uploadedFile) {
             const resourceType = item.type === "image" ? "image" : "video";
             const result = await uploadToCloudinary(uploadedFile.path, resourceType, uploadedFile.originalname);
+            await fs.unlink(uploadedFile.path);
             contentValue = result.url;
           }
         }
@@ -133,5 +137,56 @@ export const updateNote = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating note:", error);
     res.status(500).json({ message: "Failed to update note", error });
+  }
+};
+
+export const deleteNote = async (req: Request, res: Response) => {
+  try {
+    const noteId = req.params.id;
+    const deletedNote = await Note.findByIdAndDelete(noteId);
+
+    if (!deletedNote) {
+      res.status(404).json({ error: "Note not found." });
+    }
+
+    res.status(200).json({ message: "Note deleted successfully." });
+
+  } catch (error) {
+    console.error("Error deleting note:", error);
+    res.status(500).json({ message: "Failed to delete note", error });
+  }
+};
+export const getNoteById = async (req: Request, res: Response) => {
+  try {
+    const noteId = req.params.id;
+    const note = await Note.findById(noteId);
+
+    if (!note) {
+      res.status(404).json({ error: "Note not found." });
+    }
+
+    res.status(200).json(note);
+
+  } catch (error) {
+    console.error("Error fetching note:", error);
+    res.status(500).json({ message: "Failed to fetch note", error });
+  }
+};
+export const getUserNotes  = async (req: Request, res: Response) => {
+  try {
+    // const userId = req.query.userId as string;
+    const userId = req.params.userId
+    if (!userId) {
+      res.status(400).json({ error: "User ID is required." });
+    }
+    const notes = await Note.find({ userId }).sort({ createdAt: -1 });
+
+    res.status(200).json({NumberOfNotes: notes.length, notes: notes});
+    // console.log("Fetched notes for user:", userId);
+    // console.log("Notes:", notes);
+
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+    res.status(500).json({ message: "Failed to fetch notes", error });
   }
 };

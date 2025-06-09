@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createNote, updateNote } from '../controllers/note.controller';
+import { createNote, deleteNote, getUserNotes, getNoteById, updateNote } from '../controllers/note.controller';
 import multer from 'multer';
 
 const router = Router();
@@ -9,8 +9,8 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/', upload.any(), createNote);
 router.put('/:id', upload.any(), updateNote);
-// router.post('/');
-// router.post('/login',);
-// router.get('/me');
+router.get('/:id', getNoteById);
+router.get('/user/:userId', upload.any(), getUserNotes );
+router.delete('/:id', upload.any(), deleteNote);
 
 export default router;
