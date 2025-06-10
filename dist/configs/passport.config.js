@@ -29,7 +29,7 @@ passport_1.default.use(new passport_local_1.Strategy({
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:5000/api/auth/google/callback',
+    callbackURL: `${process.env.BASE_URL}/api/auth/google/callback`,
 }, async (_accessToken, _refreshToken, profile, done) => {
     try {
         const email = profile.emails?.[0].value;
@@ -49,7 +49,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
 passport_1.default.use(new passport_facebook_1.Strategy({
     clientID: process.env.FB_CLIENT_ID,
     clientSecret: process.env.FB_CLIENT_SECRET,
-    callbackURL: 'http://localhost:5000/api/auth/facebook/callback',
+    callbackURL: `${process.env.BASE_URL}/api/auth/facebook/callback`,
     profileFields: ['id', 'emails', 'name', 'displayName'],
 }, async (_accessToken, _refreshToken, profile, done) => {
     try {
@@ -64,7 +64,7 @@ passport_1.default.use(new passport_facebook_1.Strategy({
 passport_1.default.use(new passport_github_1.Strategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: "http://localhost:5000/api/auth/github/callback"
+    callbackURL: `${process.env.BASE_URL}/api/auth/github/callback`
 }, async (_accessToken, _refreshToken, profile, cb) => {
     try {
         let email = profile.emails?.[0]?.value;
