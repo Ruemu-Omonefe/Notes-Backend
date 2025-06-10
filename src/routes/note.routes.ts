@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createNote, deleteNote, getUserNotes, getNoteById, updateNote } from '../controllers/note.controller';
+import { createNote, deleteNote, getUserNotes, getNoteById, updateNote, shareNote, getSharedNote} from '../controllers/note.controller';
 import multer from 'multer';
 
 const router = Router();
@@ -12,5 +12,7 @@ router.put('/:id', upload.any(), updateNote);
 router.get('/:id', getNoteById);
 router.get('/user/:userId', upload.any(), getUserNotes );
 router.delete('/:id', upload.any(), deleteNote);
+router.post('/:noteId/share', shareNote);
+router.get('/shared/:sharedId', getSharedNote);
 
 export default router;

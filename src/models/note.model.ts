@@ -21,6 +21,9 @@ const NoteSchema = new Schema<INote>({
   numberOfPages: { type: Number, required: true },
   content: [ContentItemSchema], // array preserves order
   isFavorite: { type: Boolean, default: false },
+  isShared: { type: Boolean, default: false },
+  sharedId: { type: String, unique: true, sparse: true } // optional unique identifier
+
 }, { timestamps: true });
 
 export default mongoose.model<INote>('Note', NoteSchema);

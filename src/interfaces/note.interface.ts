@@ -22,6 +22,8 @@ export interface INote extends Document {
   numberOfPages: number;
   content: IContentItem[];
   isFavorite: boolean;
+  isShared: boolean;
+  sharedId?: string;
   createdAt: Date;
   updatedAt: Date;
 }

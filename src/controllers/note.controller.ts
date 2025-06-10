@@ -3,6 +3,10 @@ import Note from "../models/note.model";
 import { uploadToCloudinary } from "../configs/cloudinary.config";
 import { IContentItem } from "../interfaces/note.interface";
 import fs from 'fs/promises';
+// import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
+
+
 
 export const createNote = async (req: Request, res: Response) => {
   try {
@@ -190,3 +194,51 @@ export const getUserNotes  = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch notes", error });
   }
 };
+
+// Share Note Functionality
+export const shareNote = async (req: Request, res: Response) => {
+  try {
+    const { noteId } = req.params;
+
+    // Simulate sharing logic, e.g., generate a share link or set a flag
+    const note = await Note.findById(noteId);
+    if (!note) {
+      res.status(404).json({ message: 'Note not found' });
+      return;
+    }
+
+    // You can store a shared flag or generate a share token
+    note.isShared = true;
+    note.sharedId = uuidv4();
+    await note.save();
+
+    res.status(200).json({ message: 'Note shared successfully', shareUrl: `${process.env.FRONTEND_URL}/notebook/share/${note.sharedId}`});
+  } catch (error) {
+    console.error('Share error:', error);
+    res.status(500).json({ message: 'Server error while sharing note' });
+  }
+};
+
+export const getSharedNote = async (req: Request, res: Response) => {
+  const { sharedId } = req.params;
+
+  try {
+    const note = await Note.findOne({ sharedId, isShared: true });
+
+    if (!note) {
+      res.status(404).json({ error: "Shared note not found" });
+    } else {
+      res.json({
+        title: note.title,
+        content: note.content,
+        coverDesign: note.coverDesign,
+        numberOfPages: note.numberOfPages,
+        createdAt: note.createdAt,
+      });
+    }
+  } catch (err) {
+    console.error("Error fetching shared note:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
