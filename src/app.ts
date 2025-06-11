@@ -10,6 +10,7 @@ import './configs/passport.config'; // Ensure passport strategies are loaded
 import passport from 'passport';
 import userRoutes from './routes/user.routes';
 import { protect } from './middlewares/auth.middleware';
+import { setupSwagger } from './swagger';
 
 dotenv.config();
 
@@ -20,6 +21,10 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Swagger setup
+setupSwagger(app);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 

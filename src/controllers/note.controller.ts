@@ -185,6 +185,11 @@ export const getUserNotes  = async (req: Request, res: Response) => {
     }
     const notes = await Note.find({ userId }).sort({ createdAt: -1 });
 
+    if (!notes || notes.length === 0) {
+      res.status(404).json({ message: "No notes found for this user." });
+      return;
+    }
+
     res.status(200).json({NumberOfNotes: notes.length, notes: notes});
     // console.log("Fetched notes for user:", userId);
     // console.log("Notes:", notes);
