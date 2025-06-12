@@ -224,6 +224,26 @@ export const shareNote = async (req: Request, res: Response) => {
   }
 };
 
+// Get All Shared Notes for A User Functionality
+export const getSharedNotes = async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  try {
+    const notes = await Note.find({ userId, isShared: true });
+
+    if (!notes || notes.length === 0) {
+      res.status(404).json({ message: "No shared notes found for this user." });
+      return;
+    }
+
+    res.status(200).json({ notes });
+  } catch (error) {
+    console.error("Error fetching shared notes:", error);
+    res.status(500).json({ message: "Failed to fetch shared notes", error });
+  }
+};
+
+// Get Shared Note by Id Functionality
 export const getSharedNote = async (req: Request, res: Response) => {
   const { sharedId } = req.params;
 
