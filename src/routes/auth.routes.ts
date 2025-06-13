@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { register, login, oauthSuccess , getMe} from '../controllers/auth.controller';
+import { protect } from '../middlewares/auth.middleware';
+
 const router = Router();
 
 router.post('/register', register);
@@ -37,6 +39,6 @@ router.get('/github/callback', passport.authenticate('github', { session: false 
 
 
 
-router.get('/me', getMe);
+router.get('/me',protect, getMe);
 
 export default router;
