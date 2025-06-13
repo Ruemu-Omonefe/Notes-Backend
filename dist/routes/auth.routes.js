@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const passport_1 = __importDefault(require("passport"));
 const auth_controller_1 = require("../controllers/auth.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
 router.post('/register', auth_controller_1.register);
 router.post('/login', auth_controller_1.login);
@@ -33,5 +34,5 @@ router.get('/github/callback', passport_1.default.authenticate('github', { sessi
 //     return oauthSuccess(req, res);
 //   })(req, res, next);
 // });
-router.get('/me', auth_controller_1.getMe);
+router.get('/me', auth_middleware_1.protect, auth_controller_1.getMe);
 exports.default = router;

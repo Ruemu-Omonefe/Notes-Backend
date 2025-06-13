@@ -65,31 +65,14 @@
  */
 /**
  * @swagger
- * /api/auth/google:
+ * /api/auth/me:
  *   get:
- *     summary: Google OAuth login
+ *     summary: Get current user
+ *     description: This endpoint retrieves the currently authenticated user's information.
  *     tags: [Auth]
  *     responses:
- *       302:
- *         description: Redirect to Google for authentication
+ *       200:
+ *         description: User retrieved successfully
+ *       401:
+ *         description: Unauthorized
  */
-/**
- * @swagger
- * /api/auth/facebook:
- *   get:
- *     summary: Facebook OAuth login
- *     tags: [Auth]
- *     responses:
- *       302:
- *         description: Redirect to Facebook for authentication
- */
-/**
- * @swagger
- * /api/auth/github:
- *   get:
- *     summary: GitHub OAuth login
- *     tags: [Auth]
- *     responses:
- *       302:
- *         description: Redirect to GitHub for authentication
- */ 

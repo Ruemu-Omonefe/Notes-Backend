@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSharedNote = exports.shareNote = exports.getUserNotes = exports.getNoteById = exports.deleteNote = exports.updateNote = exports.createNote = void 0;
+exports.getSharedNote = exports.getSharedNotes = exports.shareNote = exports.getUserNotes = exports.getNoteById = exports.deleteNote = exports.updateNote = exports.createNote = void 0;
 const note_model_1 = __importDefault(require("../models/note.model"));
 const cloudinary_config_1 = require("../configs/cloudinary.config");
 const promises_1 = __importDefault(require("fs/promises"));
@@ -200,6 +200,24 @@ const shareNote = async (req, res) => {
     }
 };
 exports.shareNote = shareNote;
+// Get All Shared Notes for A User Functionality
+const getSharedNotes = async (req, res) => {
+    const userId = req.params.userId;
+    try {
+        const notes = await note_model_1.default.find({ userId, isShared: true });
+        if (!notes || notes.length === 0) {
+            res.status(404).json({ message: "No shared notes found for this user." });
+            return;
+        }
+        res.status(200).json({ notes });
+    }
+    catch (error) {
+        console.error("Error fetching shared notes:", error);
+        res.status(500).json({ message: "Failed to fetch shared notes", error });
+    }
+};
+exports.getSharedNotes = getSharedNotes;
+// Get Shared Note by Id Functionality
 const getSharedNote = async (req, res) => {
     const { sharedId } = req.params;
     try {
