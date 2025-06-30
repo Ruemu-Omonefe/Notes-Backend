@@ -43,8 +43,6 @@
  *                 type: string
  *               userId:
  *                 type: string
- *               coverDesign:
- *                 type: string
  *               numberOfPages:
  *                 type: integer
  *               content:
