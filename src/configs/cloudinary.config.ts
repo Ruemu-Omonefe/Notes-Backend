@@ -29,3 +29,21 @@ export const uploadToCloudinary = async (filePath: string, resourceType: 'image'
     }
   };
 };
+
+export const getCoverDesign = async (): Promise<string | null> => {
+  try {
+    const result = await cloudinary.search
+      .expression('folder:Covers')
+      .sort_by('public_id', 'desc')
+      .max_results(100)
+      .execute();
+
+    const covers = result.resources;
+    if (!covers.length) return null;
+
+    return covers.map((cover: { url: any; }) => cover.url);
+  } catch (err) {
+    console.error("Error fetching cover designs:", err);
+    return null;
+  }
+};

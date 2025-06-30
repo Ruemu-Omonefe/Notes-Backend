@@ -1,22 +1,27 @@
 import { Request, Response } from "express";
 import Note from "../models/note.model";
-import { uploadToCloudinary } from "../configs/cloudinary.config";
+import { getCoverDesign, uploadToCloudinary } from "../configs/cloudinary.config";
 import { IContentItem } from "../interfaces/note.interface";
 import fs from 'fs/promises';
 // import { nanoid } from 'nanoid';
 import { v4 as uuidv4 } from 'uuid';
+import { get } from "http";
 
 
 
 export const createNote = async (req: Request, res: Response) => {
   try {
-    const { title, userId, numberOfPages, coverDesign } = req.body;
+    const { title, userId, numberOfPages } = req.body;
+
+    let coverDesign = null;
+    const coverDesignOptions = await getCoverDesign();
+    if (coverDesignOptions) {
+      const randomIndex = Math.floor(Math.random() * coverDesignOptions.length);
+      coverDesign = coverDesignOptions[randomIndex];
+    }
 
     let contentOrder: IContentItem[] = [];
-    console.log('Received content:', req.body.content);
-    console.log('Received content:', typeof(req.body.content));
     try {
-
       contentOrder = typeof req.body.content === 'string' ? JSON.parse(req.body.content) : req.body.content;
       console.log('✅ Parsed contentOrder:', contentOrder);
     } catch (err) {
@@ -27,6 +32,7 @@ export const createNote = async (req: Request, res: Response) => {
     const files = req.files as Express.Multer.File[] || [];
     const processedContent: IContentItem[] = [];
 
+    // File Upload
     for (let item of contentOrder) {
       let contentValue = item.content;
 
@@ -54,7 +60,7 @@ export const createNote = async (req: Request, res: Response) => {
     const newNote = new Note({
       title,
       userId,
-      coverDesign,
+      coverDesign: coverDesign,
       numberOfPages,
       content: processedContent,
       isFavorite: false,
