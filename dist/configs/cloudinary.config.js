@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadToCloudinary = void 0;
+exports.getCoverDesign = exports.uploadToCloudinary = void 0;
 // utils/cloudinary.ts
 const cloudinary_1 = require("cloudinary");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -34,3 +34,21 @@ const uploadToCloudinary = async (filePath, resourceType, originalFileName) => {
     };
 };
 exports.uploadToCloudinary = uploadToCloudinary;
+const getCoverDesign = async () => {
+    try {
+        const result = await cloudinary_1.v2.search
+            .expression('folder:Covers')
+            .sort_by('public_id', 'desc')
+            .max_results(100)
+            .execute();
+        const covers = result.resources;
+        if (!covers.length)
+            return null;
+        return covers.map((cover) => cover.url);
+    }
+    catch (err) {
+        console.error("Error fetching cover designs:", err);
+        return null;
+    }
+};
+exports.getCoverDesign = getCoverDesign;

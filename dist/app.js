@@ -10,6 +10,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const note_routes_1 = __importDefault(require("./routes/note.routes"));
+const cover_routes_1 = __importDefault(require("./routes/cover.routes"));
 const error_middleware_1 = __importDefault(require("./middlewares/error.middleware"));
 require("./configs/passport.config"); // Ensure passport strategies are loaded
 const passport_1 = __importDefault(require("passport"));
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 app.use('/api/auth', auth_routes_1.default); // Authentication routes
 app.use('/api/users', auth_middleware_1.protect, user_routes_1.default); // User management routes
 app.use('/api/notes', auth_middleware_1.protect, note_routes_1.default); // Note management routes
+app.use('/api/covers', auth_middleware_1.protect, cover_routes_1.default); // Cover management routes
 // Error handling middleware
 app.use(error_middleware_1.default);
 exports.default = app;

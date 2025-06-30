@@ -1,6 +1,12 @@
 "use strict";
 /**
  * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management operations
+ */
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users

@@ -11,10 +11,14 @@ const promises_1 = __importDefault(require("fs/promises"));
 const uuid_1 = require("uuid");
 const createNote = async (req, res) => {
     try {
-        const { title, userId, numberOfPages, coverDesign } = req.body;
+        const { title, userId, numberOfPages } = req.body;
+        let coverDesign = null;
+        const coverDesignOptions = await (0, cloudinary_config_1.getCoverDesign)();
+        if (coverDesignOptions) {
+            const randomIndex = Math.floor(Math.random() * coverDesignOptions.length);
+            coverDesign = coverDesignOptions[randomIndex];
+        }
         let contentOrder = [];
-        console.log('Received content:', req.body.content);
-        console.log('Received content:', typeof (req.body.content));
         try {
             contentOrder = typeof req.body.content === 'string' ? JSON.parse(req.body.content) : req.body.content;
             console.log('✅ Parsed contentOrder:', contentOrder);
@@ -25,6 +29,7 @@ const createNote = async (req, res) => {
         }
         const files = req.files || [];
         const processedContent = [];
+        // File Upload
         for (let item of contentOrder) {
             let contentValue = item.content;
             if (item.type === "image" || item.type === "audio") {
@@ -47,7 +52,7 @@ const createNote = async (req, res) => {
         const newNote = new note_model_1.default({
             title,
             userId,
-            coverDesign,
+            coverDesign: coverDesign,
             numberOfPages,
             content: processedContent,
             isFavorite: false,
