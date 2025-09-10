@@ -38,7 +38,7 @@ passport.use(new GoogleStrategy({
       { username: profile.displayName, email: email },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
-    done(null, user);
+    done(null, { id: user._id, username: user.username, email: user.email });
   } catch (err) {
     done(err);
   }
@@ -98,7 +98,7 @@ passport.use(new GitHubStrategy({
           { username: profile.username || profile.displayName || "GitHubUser", email: email },
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
-      cb(null, user);
+      cb(null, { id: user._id, username: user.username, email: user.email });
     } catch (err) {
       cb(err);
     }
