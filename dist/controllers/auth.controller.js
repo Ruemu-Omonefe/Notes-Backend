@@ -55,7 +55,12 @@ exports.oauthSuccess = oauthSuccess;
 const getMe = async (req, res) => {
     try {
         const user = await user_model_1.default.findById(req.user.id).select('-password');
-        res.status(200).json(user);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+        }
+        else {
+            res.status(200).json({ id: user._id, username: user.username, email: user.email });
+        }
     }
     catch (error) {
         res.status(500).json({ message: 'Server error' });
